@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="shortcut icon" href="favicon.ico">
+
+<!-- Apple Devices -->
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+<!-- Android Devices -->
+<link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="android-chrome-512x512.png">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="site.webmanifest">
+  <meta charset="UTF-8" />
+  <title>BMW M4 G82 by TheGT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      background: #1a1a1a;
+      font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
+    }
+#title-bar {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: white;
+  letter-spacing: 2px;
+  z-index: 9999;
+}
+
+
+    #video-wrapper {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90vw;
+      height: 90vh;
+      z-index: 1;
+    }
+
+    #video-wrapper::before {
+      content: "";
+      position: absolute;
+      top: -20px;
+      left: -20px;
+      right: -20px;
+      bottom: -20px;
+      border-radius: 60px;
+      background: linear-gradient(45deg, red, blue, lime, magenta, cyan, red);
+      background-size: 400% 400%;
+      animation: rgbFrameGlow 10s linear infinite;
+      z-index: 0;
+      filter: blur(40px);
+      pointer-events: none;
+    }
+
+    #video-frame {
+      width: 100%;
+      height: 100%;
+      border-radius: 40px;
+      background: #000;
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: relative;
+      z-index: 2;
+    }
+
+    @keyframes rgbFrameGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ✅ RGB haze wrapper */
+    #logo-wrapper {
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 50px;
+      display: none;
+      z-index: 10000;
+    }
+
+    #logo-wrapper::after {
+      content: "";
+      position: absolute;
+      top: -20px;
+      left: -20px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, red, lime, blue, magenta, cyan, red);
+      background-size: 200% 200%;
+      animation: rgbLogoHaze 8s linear infinite;
+      filter: blur(25px);
+      z-index: -1;
+      opacity: 0.6;
+    }
+
+    #mini-logo {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
+
+    @keyframes rgbLogoHaze {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .overlay, .end-screen {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(30, 30, 30, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 3;
+      transition: opacity 0.5s ease;
+    }
+
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    button {
+      padding: 14px 28px;
+      font-size: 20px;
+      border: none;
+      border-radius: 8px;
+      background: #444;
+      color: white;
+      cursor: pointer;
+      margin: 10px;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: #666;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div id="title-bar">BMW M4 G82</div>
+  <div class="overlay" id="start-screen">
+    <button onclick="start()">Start</button>
+  </div>
+
+  <div class="overlay hidden" id="end-screen">
+    <h2 style="color: white; margin-bottom: 20px;">Video Ended</h2>
+    <button onclick="start()">Replay</button>
+  </div>
+
+  <div id="video-wrapper">
+    <div id="video-frame">
+      <video id="bg-video" preload="auto" playsinline muted >
+        <source src="https://github.com/angel2rider/main/releases/download/v3.0/1080p.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
+  <audio id="bg-audio" preload="auto" loop>
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- ✅ Logo with RGB haze wrapper -->
+  <div id="logo-wrapper">
+    <img id="mini-logo" src="logo.jpg" alt="Logo">
+  </div>
+
+  <script>
+    const video = document.getElementById("bg-video");
+    const audio = document.getElementById("bg-audio");
+    const startScreen = document.getElementById("start-screen");
+    const endScreen = document.getElementById("end-screen");
+    const logoWrapper = document.getElementById("logo-wrapper");
+    const titletext = document.getElementById("title-bar")
+
+    let isPlaying = false;
+
+    function start() {
+      startScreen.classList.add("hidden");
+      endScreen.classList.add("hidden");
+      video.load();
+      audio.load();
+      video.play();
+      audio.volume = 1;
+      audio.play();
+      isPlaying = true;
+      document.getElementById("title-bar").style.display = "block";
+      logoWrapper.style.display = "block"; // ✅ Show logo wrapper
+      titletext.style.display = "block";
+    }
+
+    video.addEventListener("ended", () => {
+      fadeOutMusic();
+      setTimeout(() => {
+        endScreen.classList.remove("hidden");
+        logoWrapper.style.display = "none";
+      }, 1000);
+      isPlaying = false;
+    });
+
+    function fadeOutMusic() {
+      let fade = setInterval(() => {
+        if (audio.volume > 0.05) {
+          audio.volume -= 0.05;
+        } else {
+          audio.volume = 0;
+          audio.pause();
+          clearInterval(fade);
+        }
+      }, 200);
+    }
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden && isPlaying) {
+        video.pause();
+        audio.pause();
+      } else if (!document.hidden && isPlaying) {
+        video.play();
+        audio.play();
+      }
+    });
+  </script>
+</body>
+</html>
